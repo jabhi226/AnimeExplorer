@@ -38,7 +38,7 @@ fun AnimeListScreen(
                     modifier = Modifier.fillMaxSize()
                 ) {
                     (uiState as? AnimeListUiState.AnimeList)?.animeList?.let {
-                        items(it.size) { index -> // 20 items for this grid
+                        items(it.size) { index ->
                             AnimeListItem(anime = it[index]) { id ->
                                 onAnimeClicked(id)
                             }
