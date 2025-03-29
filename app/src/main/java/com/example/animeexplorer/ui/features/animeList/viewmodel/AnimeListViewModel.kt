@@ -2,48 +2,67 @@ package com.example.animeexplorer.ui.features.animeList.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.PagingSource
+import androidx.paging.PagingState
+import androidx.paging.cachedIn
 import com.example.animeexplorer.domain.entities.Anime
 import com.example.animeexplorer.domain.repository.AnimeRepository
-import com.example.animeexplorer.domain.util.Response
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 
 class AnimeListViewModel(
     private val repository: AnimeRepository
 ) : ViewModel() {
 
-    private val _animeListUiState = Channel<AnimeListUiState>()
-    val animeListUiState get() = _animeListUiState.receiveAsFlow()
+    private val _animes: MutableStateFlow<PagingData<Anime>> =
+        MutableStateFlow(value = PagingData.empty())
+    val animes: StateFlow<PagingData<Anime>> get() = _animes
 
-    fun getAnimeList() {
-        viewModelScope.launch {
-            _animeListUiState.send(AnimeListUiState.Loading)
-            repository.getAnimeList().run {
-                when (this) {
-                    is Response.Error -> {
-                        _animeListUiState.send(AnimeListUiState.Error(this.error))
-                    }
-
-                    is Response.Success -> {
-                        _animeListUiState.send(
-                            if (this.data.isNullOrEmpty()) {
-                                AnimeListUiState.EmptyList
-                            } else {
-                                AnimeListUiState.AnimeList(this.data)
-                            }
-                        )
-                    }
-                }
+    suspend fun getAnimeListPaginated() {
+        pager
+            .distinctUntilChanged()
+            .collect {
+                _animes.value = it
             }
+    }
+
+    private val pager = Pager(
+        config = PagingConfig(
+            pageSize = PAGE_SIZE,
+            enablePlaceholders = false,
+            prefetchDistance = 1
+        ),
+        pagingSourceFactory = {
+            AnimePagingSource()
+        }
+    ).flow.cachedIn(viewModelScope)
+
+    inner class AnimePagingSource : PagingSource<Int, Anime>() {
+        override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Anime> {
+            val page = params.key ?: 1
+            return try {
+                val response = repository.getAnimeList(page, PAGE_SIZE)
+                LoadResult.Page(
+                    data = response.data ?: listOf(),
+                    prevKey = null,
+                    nextKey = if (response.data.isNullOrEmpty()) null else page + 1
+                )
+            } catch (exception: Exception) {
+                LoadResult.Error(exception)
+            }
+        }
+
+        override fun getRefreshKey(state: PagingState<Int, Anime>): Int? {
+            return state.anchorPosition
         }
     }
 
-    sealed class AnimeListUiState {
-        data object Loading : AnimeListUiState()
-        data class Error(val error: String) : AnimeListUiState()
-        data object EmptyList : AnimeListUiState()
-        data class AnimeList(val animeList: List<Anime>) : AnimeListUiState()
+    companion object {
+        const val PAGE_SIZE = 10
     }
+
 }

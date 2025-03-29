@@ -33,6 +33,10 @@ class AnimeRepositoryImplTest(private val httpClient: HttpClient) : AnimeReposit
         return Response.success(animeList)
     }
 
+    override suspend fun getAnimeList(pageNumber: Int, limit: Int): Response<List<Anime>> {
+        return getAnimeList()
+    }
+
     override suspend fun getAnimeDetails(animeId: Int): Response<AnimeDetails> {
 
         val res = """

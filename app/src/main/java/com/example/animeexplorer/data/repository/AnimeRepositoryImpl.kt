@@ -34,6 +34,24 @@ class AnimeRepositoryImpl(private val httpClient: HttpClient) : AnimeRepository 
         }
     }
 
+    override suspend fun getAnimeList(pageNumber: Int, limit: Int): Response<List<Anime>> {
+        val response: Response<AnimeListResponse> = httpClient.get {
+            url("${HttpRoutes.ANIME_LIST_URL}?page=$pageNumber&limit=$limit")
+        }.parseClassOrError(AnimeListResponse::class)
+        return if (response is Response.Error) {
+            Response.error(response.error)
+        } else {
+            response.data!!.let { animeListResponse ->
+                val animeList = animeListResponse.data
+                    .filter { it.malId != null }
+                    .map {
+                        it.getAnime()
+                    }
+                Response.success(animeList)
+            }
+        }
+    }
+
     override suspend fun getAnimeDetails(animeId: Int): Response<AnimeDetails> {
         val response: Response<AnimeDetailsResponse> = httpClient.get {
             url(HttpRoutes.ANIME_DETAIL_URL + "$animeId")
@@ -42,7 +60,8 @@ class AnimeRepositoryImpl(private val httpClient: HttpClient) : AnimeRepository 
             Response.error(response.error)
         } else {
             val res =
-                response.data?.data?.getAnimeDetails() ?: return Response.error("Something went wrong")
+                response.data?.data?.getAnimeDetails()
+                    ?: return Response.error("Something went wrong")
             Response.success(res)
         }
     }
