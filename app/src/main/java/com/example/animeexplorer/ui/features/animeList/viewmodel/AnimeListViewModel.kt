@@ -10,9 +10,14 @@ import androidx.paging.PagingState
 import androidx.paging.cachedIn
 import com.example.animeexplorer.domain.entities.Anime
 import com.example.animeexplorer.domain.repository.AnimeRepository
+import com.example.animeexplorer.domain.util.Response
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.launch
 
 class AnimeListViewModel(
     private val repository: AnimeRepository
@@ -23,29 +28,55 @@ class AnimeListViewModel(
     val animes: StateFlow<PagingData<Anime>> get() = _animes
 
     suspend fun getAnimeListPaginated() {
-        pager
+        getAnimePager { pageNumber ->
+            repository.getAnimeList(pageNumber, PAGE_SIZE)
+        }
             .distinctUntilChanged()
             .collect {
                 _animes.value = it
             }
     }
 
-    private val pager = Pager(
-        config = PagingConfig(
-            pageSize = PAGE_SIZE,
-            enablePlaceholders = false,
-            prefetchDistance = 1
-        ),
-        pagingSourceFactory = {
-            AnimePagingSource()
+    private var searchJob: Job? = null
+    fun searchByText(text: String) {
+        _animes.value = PagingData.empty()
+        searchJob?.cancel()
+        searchJob = viewModelScope.launch {
+            delay(300)
+            getAnimePager { pageNumber ->
+                repository.getAnimeListByText(pageNumber, PAGE_SIZE, text)
+            }
+                .distinctUntilChanged()
+                .collect {
+                    _animes.value = it
+                }
         }
-    ).flow.cachedIn(viewModelScope)
+    }
 
-    inner class AnimePagingSource : PagingSource<Int, Anime>() {
+    private fun getAnimePager(
+        getAnimeList: suspend (Int) -> Response<List<Anime>>
+    ): Flow<PagingData<Anime>> {
+        return Pager(
+            config = PagingConfig(
+                pageSize = PAGE_SIZE,
+                enablePlaceholders = false,
+                prefetchDistance = 1
+            ),
+            pagingSourceFactory = {
+                AnimePagingSource { pageNumber ->
+                    getAnimeList(pageNumber)
+                }
+            }
+        ).flow.cachedIn(viewModelScope)
+    }
+
+    class AnimePagingSource(
+        val getAnimeList: suspend (Int) -> Response<List<Anime>>,
+    ) : PagingSource<Int, Anime>() {
         override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Anime> {
             val page = params.key ?: 1
             return try {
-                val response = repository.getAnimeList(page, PAGE_SIZE)
+                val response = getAnimeList(page)
                 LoadResult.Page(
                     data = response.data ?: listOf(),
                     prevKey = null,

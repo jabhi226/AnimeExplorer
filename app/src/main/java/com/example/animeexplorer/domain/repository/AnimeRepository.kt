@@ -12,4 +12,6 @@ interface AnimeRepository {
 
     suspend fun getAnimeList(pageNumber: Int, limit: Int): Response<List<Anime>>
 
+    suspend fun getAnimeListByText(pageNumber: Int, limit: Int, text: String): Response<List<Anime>>
+
 }

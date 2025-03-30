@@ -11,7 +11,7 @@ import com.example.animeexplorer.domain.util.Response
 import io.ktor.client.HttpClient
 import kotlinx.serialization.json.Json
 
-class AnimeRepositoryImplTest(private val httpClient: HttpClient) : AnimeRepository {
+class AnimeRepositoryImplTest() : AnimeRepository {
 
     override suspend fun getAnimeList(): Response<List<Anime>> {
 //        val response: Response<AnimeListResponse> = httpClient.get {
@@ -228,6 +228,14 @@ class AnimeRepositoryImplTest(private val httpClient: HttpClient) : AnimeReposit
         val response = Json.decodeFromString<AnimeDetailsResponse>(res)
         val res1 = response.data.getAnimeDetails() ?: return Response.error("Something went wrong")
         return Response.success(res1)
+    }
+
+    override suspend fun getAnimeListByText(
+        pageNumber: Int,
+        limit: Int,
+        text: String
+    ): Response<List<Anime>> {
+        return getAnimeList()
     }
 
 }
