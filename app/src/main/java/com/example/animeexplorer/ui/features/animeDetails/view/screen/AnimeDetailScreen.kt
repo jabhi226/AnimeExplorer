@@ -1,9 +1,7 @@
 package com.example.animeexplorer.ui.features.animeDetails.view.screen
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,14 +10,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
@@ -31,7 +26,7 @@ import com.example.animeexplorer.domain.entities.AnimeDetails
 import com.example.animeexplorer.ui.features.animeDetails.model.Action
 import com.example.animeexplorer.ui.features.animeDetails.view.component.ActionsComponent
 import com.example.animeexplorer.ui.features.animeDetails.view.component.GenresComponent
-import com.example.animeexplorer.ui.features.animeDetails.view.component.TrailerComponent
+import com.example.animeexplorer.ui.features.animeDetails.view.component.ImagesComponent
 import com.example.animeexplorer.ui.features.animeDetails.viewmodel.AnimeDetailViewModel
 import com.example.animeexplorer.ui.features.animeDetails.viewmodel.AnimeDetailViewModel.AnimeDetailsUiState
 import com.example.animeexplorer.ui.features.core.component.CommonText
@@ -44,32 +39,32 @@ import org.koin.androidx.compose.koinViewModel
 fun AnimeDetailScreen(
     modifier: Modifier = Modifier,
     viewModel: AnimeDetailViewModel = koinViewModel<AnimeDetailViewModel>(),
-    onAnimeImageClicked: () -> Unit
+    onAnimeImageClicked: (String) -> Unit
 ) {
-    val uiState by viewModel.animeDetailsUiState.collectAsState()
+    val uiState: AnimeDetailsUiState by viewModel.animeDetailsUiState.collectAsState()
 
     Box(
         modifier = modifier
             .fillMaxSize()
     ) {
-        when (uiState) {
-            is AnimeDetailsUiState.AnimeDetailsState -> {
-                val animeDetails = (uiState as? AnimeDetailsUiState.AnimeDetailsState)?.details
-                if (animeDetails == null) {
-                    ErrorScreen(text = "Cannot found the anime details")
-                    return
-                }
-                AnimeDetails(
-                    modifier = Modifier,
-                    animeDetails = animeDetails
-                ) {
-                    onAnimeImageClicked()
-                }
+        if (uiState.animeDetails != null) {
+            val animeDetails = uiState.animeDetails
+            if (animeDetails == null) {
+                ErrorScreen(text = "Cannot found the anime details")
+                return
             }
-
-            is AnimeDetailsUiState.Error -> ErrorScreen(text = (uiState as? AnimeDetailsUiState.Error)?.error.toString())
-            AnimeDetailsUiState.Loading -> LoadingScreen()
+            AnimeDetails(
+                modifier = Modifier
+                    .fillMaxSize(),
+                animeDetails = animeDetails,
+            ) {
+                onAnimeImageClicked(it)
+            }
         }
+        if (!uiState.error.isNullOrEmpty()) {
+            ErrorScreen(text = uiState.error.toString())
+        }
+        LoadingScreen(isShowLoading = uiState.isLoading)
     }
 
 }
@@ -89,31 +84,29 @@ fun AnimeDetailPreview(modifier: Modifier = Modifier) {
 fun AnimeDetails(
     modifier: Modifier = Modifier,
     animeDetails: AnimeDetails,
-    onAnimeImageClicked: () -> Unit
+    onAnimeImageClicked: (String) -> Unit
 ) {
     LazyColumn(
-        modifier = modifier.padding(horizontal = 8.dp),
+        modifier = modifier
+            .fillMaxSize()
+            .padding(horizontal = 8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         item {
             Box(
-                modifier = modifier
-                    .fillMaxWidth()
-                    .clickable {
-                        onAnimeImageClicked()
-                    },
-                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .fillParentMaxHeight(0.5F)
             ) {
-                TrailerComponent(
-                    modifier = modifier
-                        .fillMaxWidth(0.75F),
-                    trailerUrl = animeDetails.trailerUrl,
-                    trailerImageUrl = animeDetails.trailerImageUrl ?: animeDetails.posterUrl,
-                    posterUrl = animeDetails.posterUrl,
+                ImagesComponent(
+                    modifier = modifier,
+                    animeImages = animeDetails.posterUrl,
+                    onAnimeImageClicked = {
+                        onAnimeImageClicked(it)
+                    }
                 )
             }
-        }
 
+        }
         item {
             CommonText(
                 modifier = Modifier.fillMaxWidth(),
@@ -125,12 +118,6 @@ fun AnimeDetails(
                     letterSpacing = TextUnit(value = 1F, type = TextUnitType.Sp)
                 )
             )
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-            }
         }
 
         item {
@@ -162,7 +149,7 @@ fun AnimeDetails(
                         id = 1,
                         label = status,
                         imageId = R.drawable.ic_finished,
-//                        imageId = R.drawable.ic_incomplete,
+                        //                        imageId = R.drawable.ic_incomplete,
                         isActive = false
                     ),
                 )
@@ -205,7 +192,6 @@ fun AnimeDetails(
                 modifier = Modifier, items = actionList
             )
         }
-
         item {
             CommonText(
                 modifier = modifier,
@@ -218,12 +204,12 @@ fun AnimeDetails(
         }
 
         item {
-//            CommonText(text = "Overview", fontSize = 24.sp)
-            Spacer(modifier = Modifier.height(8.dp))
-            CommonText(modifier = Modifier.fillMaxWidth(), text = animeDetails.synopsis)
+            Spacer(modifier = modifier.height(8.dp))
+            CommonText(modifier = modifier.fillMaxWidth(), text = animeDetails.synopsis)
         }
+
         item {
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = modifier.height(24.dp))
         }
     }
 }

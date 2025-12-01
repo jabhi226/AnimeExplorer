@@ -21,17 +21,13 @@ class AnimeRepositoryImpl(private val httpClient: HttpClient) : AnimeRepository 
         val response: Response<AnimeListResponse> = httpClient.get {
             url(HttpRoutes.ANIME_LIST_URL)
         }.parseClassOrError(AnimeListResponse::class)
-        return if (response is Response.Error) {
-            Response.error(response.error)
-        } else {
-            response.data!!.let { animeListResponse ->
-                val animeList = animeListResponse.data
-                    .filter { it.malId != null }
-                    .map {
-                        it.getAnime()
-                    }
-                Response.success(animeList)
-            }
+        return when (response) {
+            is Response.Error -> Response.error(response.error)
+            is Response.Success -> Response.success(response.value.data
+                .filter { it.malId != null }
+                .map {
+                    it.getAnime()
+                })
         }
     }
 
@@ -39,15 +35,14 @@ class AnimeRepositoryImpl(private val httpClient: HttpClient) : AnimeRepository 
         val response: Response<AnimeListResponse> = httpClient.get {
             url("${HttpRoutes.ANIME_LIST_URL}?page=$pageNumber&limit=$limit")
         }.parseClassOrError(AnimeListResponse::class)
-        return if (response is Response.Error) {
-            Response.error(response.error)
-        } else {
-            response.data!!.let { animeListResponse ->
-                val animeList = animeListResponse.data
+        return when (response) {
+            is Response.Error -> Response.error(response.error)
+            is Response.Success -> {
+                val animeList = response
+                    .value
+                    .data
                     .filter { it.malId != null }
-                    .map {
-                        it.getAnime()
-                    }
+                    .map { it.getAnime() }
                 Response.success(animeList)
             }
         }
@@ -57,13 +52,12 @@ class AnimeRepositoryImpl(private val httpClient: HttpClient) : AnimeRepository 
         val response: Response<AnimeDetailsResponse> = httpClient.get {
             url(HttpRoutes.ANIME_DETAIL_URL + "/$animeId")
         }.parseClassOrError(AnimeDetailsResponse::class)
-        return if (response is Response.Error) {
-            Response.error(response.error)
-        } else {
-            val res =
-                response.data?.data?.getAnimeDetails()
+        return when (response) {
+            is Response.Error -> Response.error(response.error)
+            is Response.Success -> Response.success(
+                response.value.data.getAnimeDetails()
                     ?: return Response.error("Something went wrong")
-            Response.success(res)
+            )
         }
     }
 
@@ -75,17 +69,14 @@ class AnimeRepositoryImpl(private val httpClient: HttpClient) : AnimeRepository 
         val response: Response<AnimeListResponse> = httpClient.get {
             url("${HttpRoutes.ANIME_SEARCH_URL}?page=$pageNumber&limit=$limit&q=$text")
         }.parseClassOrError(AnimeListResponse::class)
-        return if (response is Response.Error) {
-            Response.error(response.error)
-        } else {
-            response.data!!.let { animeListResponse ->
-                val animeList = animeListResponse.data
+        return when (response) {
+            is Response.Error -> Response.error(response.error)
+            is Response.Success ->
+                Response.success(response.value.data
                     .filter { it.malId != null }
                     .map {
                         it.getAnime()
-                    }
-                Response.success(animeList)
-            }
+                    })
         }
     }
 
@@ -95,16 +86,16 @@ class AnimeRepositoryImpl(private val httpClient: HttpClient) : AnimeRepository 
         val response: Response<AnimeImages> = httpClient.get {
             url(HttpRoutes.getAnimeImageUrl(animeId = animeId))
         }.parseClassOrError(AnimeImages::class)
-        return if (response is Response.Error) {
-            Response.error(response.error)
-        } else {
-            Response.success(
-                response.data!!.let { data ->
-                    data.data.mapNotNull {
-                        it.jpg?.largeImageUrl ?: it.webp?.largeImageUrl
+        return when (response) {
+            is Response.Error -> Response.error(response.error)
+            is Response.Success ->
+                Response.success(
+                    response.value.let { data ->
+                        data.data.mapNotNull {
+                            it.jpg?.largeImageUrl ?: it.webp?.largeImageUrl
+                        }
                     }
-                }
-            )
+                )
         }
     }
 

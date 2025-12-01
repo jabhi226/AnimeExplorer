@@ -16,7 +16,6 @@ import kotlinx.serialization.json.Json
 class AnimeRepositoryImplTest : AnimeRepository {
 
     override suspend fun getAnimeList(): Response<List<Anime>> {
-        delay(4000)
         val res = """
             {
                 "pagination": {
@@ -1820,7 +1819,6 @@ class AnimeRepositoryImplTest : AnimeRepository {
     }
 
     override suspend fun getAnimeDetails(animeId: Int): Response<AnimeDetails> {
-        delay(4000)
         val res = """
             {
                 "data": {
@@ -2042,7 +2040,6 @@ class AnimeRepositoryImplTest : AnimeRepository {
     }
 
     override suspend fun getAnimeImageList(animeId: Int): Response<List<String>> {
-        delay(4000)
         val res = """
             {
                 "data": [

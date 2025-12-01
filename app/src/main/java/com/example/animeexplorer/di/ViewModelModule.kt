@@ -8,6 +8,7 @@ import org.koin.dsl.module
 
 val viewModelModule = module {
     viewModel { AnimeListViewModel(get()) }
+
     viewModel { (state: SavedStateHandle) ->
         AnimeDetailViewModel(state, get())
     }

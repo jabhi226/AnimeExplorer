@@ -1,6 +1,6 @@
 package com.example.animeexplorer.domain.util
 
-sealed class Response<out T>(val data: T?) {
+sealed class Response<out T>(private val data: T?) {
 
     data class Success<out T>(val value: T) : Response<T>(value)
 

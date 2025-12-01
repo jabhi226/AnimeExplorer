@@ -9,7 +9,7 @@ import androidx.navigation.toRoute
 import com.example.animeexplorer.ui.features.animeDetails.view.screen.AnimeDetailScreen
 import com.example.animeexplorer.ui.features.animeDetails.view.screen.ScreenAnimeDetail
 import com.example.animeexplorer.ui.features.animeImages.view.screens.AnimeImagesScreen
-import com.example.animeexplorer.ui.features.animeImages.view.screens.ScreenAnimeImages
+import com.example.animeexplorer.ui.features.animeImages.view.screens.ScreenAnimeImage
 import com.example.animeexplorer.ui.features.animeList.view.screens.AnimeListScreen
 import com.example.animeexplorer.ui.features.animeList.view.screens.ScreenAnimeList
 
@@ -32,14 +32,14 @@ fun AnimeExplorerApp(modifier: Modifier = Modifier) {
 
             AnimeDetailScreen(
                 modifier = modifier,
-                onAnimeImageClicked = {
-                    navController.navigate(ScreenAnimeImages(animeId = arg.animeId))
+                onAnimeImageClicked = { imageUrl ->
+                    navController.navigate(ScreenAnimeImage(animeUrl = imageUrl))
                 }
             )
         }
-        composable<ScreenAnimeImages> {
-            val arg = it.toRoute<ScreenAnimeImages>()
-            AnimeImagesScreen(modifier = modifier, arg.animeId)
+        composable<ScreenAnimeImage> {
+            val arg = it.toRoute<ScreenAnimeImage>()
+            AnimeImagesScreen(modifier = modifier, imageUrl = arg.animeUrl)
         }
 
     }

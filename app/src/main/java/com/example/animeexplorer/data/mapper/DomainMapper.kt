@@ -32,7 +32,7 @@ fun AnimeDetailsResponse.Data.getAnimeDetails(): AnimeDetails? {
             genres = genres.map { it.name.toString() },
             trailerUrl = trailer?.embedUrl ?: "https://www.youtube.com/embed/${trailer?.youtubeId}?autoplay=0&modestbranding=1",// trailer?.embedUrl,
             trailerImageUrl = thimbnil,
-            posterUrl = images?.jpg?.largeImageUrl,
+            posterUrl = images?.jpg?.largeImageUrl?.let { mutableSetOf(it) } ?: mutableSetOf(),
             noOfEpisodes = episodes,
             duration = duration,
             status = status,

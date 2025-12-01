@@ -15,52 +15,79 @@ class AnimeDetailViewModel(
     private val repository: AnimeRepository
 ) : ViewModel() {
 
-    private val _animeDetailsUiState =
-        MutableStateFlow<AnimeDetailsUiState>(AnimeDetailsUiState.Loading)
+    private val _animeDetailsUiState = MutableStateFlow(AnimeDetailsUiState())
     val animeDetailsUiState get() = _animeDetailsUiState as StateFlow<AnimeDetailsUiState>
+
+    private fun updateState(
+        isLoading: Boolean? = null,
+        error: String? = null,
+        animeDetails: AnimeDetails? = null,
+        animeImages: List<String>? = null
+    ) {
+        viewModelScope.launch {
+            val state = animeDetailsUiState.value
+            val details = animeDetails ?: state.animeDetails
+            animeImages?.let {
+                details?.posterUrl?.addAll(it)
+            }
+            _animeDetailsUiState.emit(
+                state.copy(
+                    isLoading = isLoading ?: false,
+                    error = error ?: state.error,
+                    animeDetails = details,
+                )
+            )
+        }
+    }
 
     init {
         savedStateHandle.get<Int>("animeId")?.let {
             getAnimeDetails(it)
+            getAnimeImages(it)
         } ?: {
-            viewModelScope.launch {
-                _animeDetailsUiState.emit(
-                    AnimeDetailsUiState.Error("Anime Not Found")
-                )
-            }
+            updateState(error = "Anime Not Found")
         }
     }
 
     private fun getAnimeDetails(animeId: Int) {
         viewModelScope.launch {
-            _animeDetailsUiState.emit(
-                AnimeDetailsUiState.Loading
-            )
+            updateState(isLoading = true)
             repository.getAnimeDetails(animeId).run {
                 when (this) {
                     is Response.Error -> {
-                        _animeDetailsUiState.emit(
-                            AnimeDetailsUiState.Error(this.error)
-                        )
+                        updateState(error = this.error)
                     }
 
                     is Response.Success -> {
-                        this.data?.let {
-                            _animeDetailsUiState.emit(
-                                AnimeDetailsUiState.AnimeDetailsState(it)
-                            )
-                        }
+                        updateState(
+                            animeDetails = this.value,
+                        )
                     }
                 }
             }
         }
     }
 
+    private fun getAnimeImages(animeId: Int) {
+        viewModelScope.launch {
+            repository.getAnimeImageList(animeId).run {
+                when (this) {
+                    is Response.Error -> {
+                        updateState(error = this.error)
+                    }
 
-    sealed class AnimeDetailsUiState {
-        data object Loading : AnimeDetailsUiState()
-        data class Error(val error: String) : AnimeDetailsUiState()
-        data class AnimeDetailsState(val details: AnimeDetails) : AnimeDetailsUiState()
+                    is Response.Success -> {
+                        updateState(animeImages = this.value)
+                    }
+                }
+            }
+        }
     }
+
+    data class AnimeDetailsUiState(
+        var isLoading: Boolean = true,
+        var error: String? = null,
+        var animeDetails: AnimeDetails? = null,
+    )
 
 }
