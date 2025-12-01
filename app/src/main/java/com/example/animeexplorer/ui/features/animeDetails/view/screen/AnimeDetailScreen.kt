@@ -1,5 +1,6 @@
 package com.example.animeexplorer.ui.features.animeDetails.view.screen
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -40,14 +41,12 @@ import kotlinx.serialization.Serializable
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun AnimeDetailScreen(modifier: Modifier = Modifier, animeId: Int) {
-
-    val viewModel = koinViewModel<AnimeDetailViewModel>()
-    val uiState by viewModel.animeDetailsUiState.collectAsState(initial = AnimeDetailsUiState.Loading)
-
-    LaunchedEffect(animeId) {
-        viewModel.getAnimeDetails(animeId)
-    }
+fun AnimeDetailScreen(
+    modifier: Modifier = Modifier,
+    viewModel: AnimeDetailViewModel = koinViewModel<AnimeDetailViewModel>(),
+    onAnimeImageClicked: () -> Unit
+) {
+    val uiState by viewModel.animeDetailsUiState.collectAsState()
 
     Box(
         modifier = modifier
@@ -60,7 +59,12 @@ fun AnimeDetailScreen(modifier: Modifier = Modifier, animeId: Int) {
                     ErrorScreen(text = "Cannot found the anime details")
                     return
                 }
-                AnimeDetails(modifier = Modifier, animeDetails = animeDetails)
+                AnimeDetails(
+                    modifier = Modifier,
+                    animeDetails = animeDetails
+                ) {
+                    onAnimeImageClicked()
+                }
             }
 
             is AnimeDetailsUiState.Error -> ErrorScreen(text = (uiState as? AnimeDetailsUiState.Error)?.error.toString())
@@ -77,14 +81,15 @@ fun AnimeDetailPreview(modifier: Modifier = Modifier) {
         AnimeDetails(
             modifier = modifier,
             animeDetails = AnimeDetails.mockObject
-        )
+        ) {}
     }
 }
 
 @Composable
 fun AnimeDetails(
     modifier: Modifier = Modifier,
-    animeDetails: AnimeDetails
+    animeDetails: AnimeDetails,
+    onAnimeImageClicked: () -> Unit
 ) {
     LazyColumn(
         modifier = modifier.padding(horizontal = 8.dp),
@@ -93,7 +98,10 @@ fun AnimeDetails(
         item {
             Box(
                 modifier = modifier
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .clickable {
+                        onAnimeImageClicked()
+                    },
                 contentAlignment = Alignment.Center,
             ) {
                 TrailerComponent(
@@ -126,7 +134,6 @@ fun AnimeDetails(
         }
 
         item {
-//            CommonText(text = "Genres", fontSize = 24.sp)
             Spacer(modifier = Modifier.height(8.dp))
             val actionList = arrayListOf(
                 Action(

@@ -10,16 +10,13 @@ import com.example.animeexplorer.domain.entities.AnimeDetails
 import com.example.animeexplorer.domain.repository.AnimeRepository
 import com.example.animeexplorer.domain.util.Response
 import io.ktor.client.HttpClient
+import kotlinx.coroutines.delay
 import kotlinx.serialization.json.Json
 
 class AnimeRepositoryImplTest : AnimeRepository {
 
     override suspend fun getAnimeList(): Response<List<Anime>> {
-//        val response: Response<AnimeListResponse> = httpClient.get {
-//            url(HttpRoutes.ANIME_LIST_URL)
-//        }.parseClassOrError(AnimeListResponse::class)
-
-
+        delay(4000)
         val res = """
             {
                 "pagination": {
@@ -1823,7 +1820,7 @@ class AnimeRepositoryImplTest : AnimeRepository {
     }
 
     override suspend fun getAnimeDetails(animeId: Int): Response<AnimeDetails> {
-
+        delay(4000)
         val res = """
             {
                 "data": {
@@ -2045,6 +2042,7 @@ class AnimeRepositoryImplTest : AnimeRepository {
     }
 
     override suspend fun getAnimeImageList(animeId: Int): Response<List<String>> {
+        delay(4000)
         val res = """
             {
                 "data": [
