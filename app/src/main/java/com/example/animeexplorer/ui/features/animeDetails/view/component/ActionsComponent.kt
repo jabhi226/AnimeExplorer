@@ -4,7 +4,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -19,6 +21,7 @@ import com.example.animeexplorer.ui.features.core.component.CommonImage
 import com.example.animeexplorer.ui.features.core.component.CommonText
 import com.example.animeexplorer.ui.theme.DarkColorScheme
 import com.google.accompanist.flowlayout.FlowRow
+import com.google.accompanist.flowlayout.SizeMode
 
 @Preview(
     showBackground = true
@@ -35,13 +38,13 @@ fun ActionPre(modifier: Modifier = Modifier) {
                     Action(
                         id = 1,
                         label = "Watch Trailer",
-                        imageId = R.drawable.ic_star,
+                        imageId = R.drawable.ic_play,
                         isActive = true
                     ),
                     Action(
                         id = 1,
                         label = "Bookmark",
-                        imageId = R.drawable.ic_star,
+                        imageId = R.drawable.ic_bookmark,
                         isActive = false
                     ),
                     Action(
@@ -53,7 +56,7 @@ fun ActionPre(modifier: Modifier = Modifier) {
                     Action(
                         id = 1,
                         label = "Completed",
-                        imageId = R.drawable.ic_star,
+                        imageId = R.drawable.ic_check,
                         isActive = false
                     ),
                     Action(
@@ -76,6 +79,7 @@ fun ActionsComponent(
 ) {
     FlowRow(
         modifier = modifier,
+        mainAxisSize = SizeMode.Expand,
         mainAxisSpacing = 8.dp,
         crossAxisSpacing = 8.dp,
     ) {
@@ -83,11 +87,13 @@ fun ActionsComponent(
             val item = items[it]
             Row(
                 modifier = Modifier
+                    .fillMaxHeight()
                     .background(
                         color = if (item.isActive) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.inverseSurface,
                         shape = RoundedCornerShape(8.dp)
                     )
-                    .padding(8.dp),
+                    .padding(8.dp)
+                    .sizeIn(minHeight = 24.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {

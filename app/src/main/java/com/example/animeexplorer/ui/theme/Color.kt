@@ -12,7 +12,7 @@ val LightInverseSurface = Color(0xFF2A2D31)
 val LightOnInverseSurface = Color(0xFFE3E3E3)
 
 
-val DarkPrimary = Color(0xFFFFC56D)
+val DarkPrimary = Color(0xFFE4E4E7)
 val DarkSecondary = Color(0xFFFF6D1F)
 val DarkTertiary = Color(0xFFFF6A9C)
 val DarkBackground = Color(0xFF0C0C0F)

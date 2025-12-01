@@ -3,6 +3,7 @@ package com.example.animeexplorer.data.repository
 import com.example.animeexplorer.data.mapper.getAnime
 import com.example.animeexplorer.data.mapper.getAnimeDetails
 import com.example.animeexplorer.data.dto.AnimeDetailsResponse
+import com.example.animeexplorer.data.dto.AnimeImages
 import com.example.animeexplorer.data.dto.AnimeListResponse
 import com.example.animeexplorer.data.utils.HttpRoutes
 import com.example.animeexplorer.data.utils.ResponseExtensions.parseClassOrError
@@ -85,6 +86,25 @@ class AnimeRepositoryImpl(private val httpClient: HttpClient) : AnimeRepository 
                     }
                 Response.success(animeList)
             }
+        }
+    }
+
+    override suspend fun getAnimeImageList(
+        animeId: Int
+    ): Response<List<String>> {
+        val response: Response<AnimeImages> = httpClient.get {
+            url(HttpRoutes.getAnimeImageUrl(animeId = animeId))
+        }.parseClassOrError(AnimeImages::class)
+        return if (response is Response.Error) {
+            Response.error(response.error)
+        } else {
+            Response.success(
+                response.data!!.let { data ->
+                    data.data.mapNotNull {
+                        it.jpg?.largeImageUrl ?: it.webp?.largeImageUrl
+                    }
+                }
+            )
         }
     }
 

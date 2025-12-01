@@ -1,9 +1,7 @@
 package com.example.animeexplorer.ui.features.animeDetails.view.screen
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,10 +16,13 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.LineHeightStyle
+import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.animeexplorer.R
@@ -32,7 +33,6 @@ import com.example.animeexplorer.ui.features.animeDetails.view.component.GenresC
 import com.example.animeexplorer.ui.features.animeDetails.view.component.TrailerComponent
 import com.example.animeexplorer.ui.features.animeDetails.viewmodel.AnimeDetailViewModel
 import com.example.animeexplorer.ui.features.animeDetails.viewmodel.AnimeDetailViewModel.AnimeDetailsUiState
-import com.example.animeexplorer.ui.features.core.component.CommonImage
 import com.example.animeexplorer.ui.features.core.component.CommonText
 import com.example.animeexplorer.ui.features.core.screen.ErrorScreen
 import com.example.animeexplorer.ui.features.core.screen.LoadingScreen
@@ -52,7 +52,6 @@ fun AnimeDetailScreen(modifier: Modifier = Modifier, animeId: Int) {
     Box(
         modifier = modifier
             .fillMaxSize()
-            .padding(16.dp)
     ) {
         when (uiState) {
             is AnimeDetailsUiState.AnimeDetailsState -> {
@@ -71,7 +70,7 @@ fun AnimeDetailScreen(modifier: Modifier = Modifier, animeId: Int) {
 
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, showSystemUi = true, device = Devices.PIXEL_7)
 @Composable
 fun AnimeDetailPreview(modifier: Modifier = Modifier) {
     MaterialTheme {
@@ -111,8 +110,12 @@ fun AnimeDetails(
             CommonText(
                 modifier = Modifier.fillMaxWidth(),
                 text = animeDetails.animeTitle,
-                fontSize = 24.sp,
-                fontWeight = FontWeight.W700
+                fontSize = 26.sp,
+                fontWeight = FontWeight.W700,
+                style = TextStyle(
+                    lineHeight = TextUnit(value = 28F, type = TextUnitType.Sp),
+                    letterSpacing = TextUnit(value = 1F, type = TextUnitType.Sp)
+                )
             )
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -129,19 +132,19 @@ fun AnimeDetails(
                 Action(
                     id = 1,
                     label = "Watch Trailer",
-                    imageId = R.drawable.ic_star,
+                    imageId = R.drawable.ic_play,
                     isActive = false
                 ),
                 Action(
                     id = 1,
                     label = "Bookmark",
-                    imageId = R.drawable.ic_star,
+                    imageId = R.drawable.ic_bookmark,
                     isActive = true
                 ),
                 Action(
                     id = 1,
                     label = "Completed",
-                    imageId = R.drawable.ic_star,
+                    imageId = R.drawable.ic_check,
                     isActive = true
                 ),
             )
@@ -151,7 +154,8 @@ fun AnimeDetails(
                     Action(
                         id = 1,
                         label = status,
-                        imageId = R.drawable.ic_star,
+                        imageId = R.drawable.ic_finished,
+//                        imageId = R.drawable.ic_incomplete,
                         isActive = false
                     ),
                 )
@@ -199,7 +203,7 @@ fun AnimeDetails(
             CommonText(
                 modifier = modifier,
                 text = "Genres",
-                fontSize = 24.sp,
+                fontSize = 26.sp,
                 fontWeight = FontWeight.W700
             )
             Spacer(modifier = modifier.height(8.dp))
