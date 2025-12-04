@@ -14,6 +14,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -32,8 +33,8 @@ fun AnimeListItem(
 ) {
     Column(
         modifier = modifier
-            .padding(8.dp)
             .fillMaxWidth(1F)
+            .clip(RoundedCornerShape(16.dp))
             .clickable {
                 onAnimeClicked(anime.animeId)
             }
@@ -47,7 +48,10 @@ fun AnimeListItem(
             } else {
                 CommonAsyncImage(
                     modifier = Modifier
-                        .background(color = Color.Transparent, shape = RoundedCornerShape(8.dp))
+                        .background(
+                            color = Color.Transparent,
+                        )
+                        .clip(RoundedCornerShape(16.dp))
                         .fillMaxWidth(1F)
                         .height(320.dp),
                     model = anime.posterUrl,
@@ -59,8 +63,9 @@ fun AnimeListItem(
                 modifier = Modifier
                     .align(Alignment.BottomStart)
                     .background(
-                        color = MaterialTheme.colorScheme.primaryContainer,
-                        shape = RoundedCornerShape(topEnd = 8.dp)
+                        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.75F),
+//                        shape = RoundedCornerShape(16.dp)
+                        shape = RoundedCornerShape(topEnd = 16.dp, bottomStart = 16.dp)
                     )
                     .padding(vertical = 4.dp, horizontal = 6.dp)
             ) {
@@ -74,8 +79,9 @@ fun AnimeListItem(
                     modifier = Modifier
                         .align(Alignment.BottomEnd)
                         .background(
-                            color = MaterialTheme.colorScheme.primaryContainer,
-                            shape = RoundedCornerShape(topStart = 8.dp)
+                            color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.75F),
+//                            shape = RoundedCornerShape(16.dp)
+                            shape = RoundedCornerShape(topStart = 16.dp, bottomEnd = 16.dp)
                         )
                         .padding(vertical = 4.dp, horizontal = 6.dp)
                 ) {

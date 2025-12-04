@@ -76,11 +76,19 @@ class AnimeListViewModel(
         override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Anime> {
             val page = params.key ?: 1
             return try {
-                val response = getAnimeList(page)
-                LoadResult.Page(
-                    data = response.data ?: listOf(),
+                val data = when (val response = getAnimeList(page)) {
+                    is Response.Error -> {
+                        listOf()
+                    }
+
+                    is Response.Success -> {
+                        response.value
+                    }
+                }
+                return LoadResult.Page(
+                    data = data,
                     prevKey = null,
-                    nextKey = if (response.data.isNullOrEmpty()) null else page + 1
+                    nextKey = if (data.isEmpty()) null else page + 1
                 )
             } catch (exception: Exception) {
                 LoadResult.Error(exception)

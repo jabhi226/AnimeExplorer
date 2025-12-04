@@ -2,6 +2,7 @@ package com.example.animeexplorer.ui.features.core.component
 
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -9,6 +10,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -43,7 +45,14 @@ fun CommonOutlinedTextField(
                 text = hint, textColor = MaterialTheme.colorScheme.onTertiaryContainer
             )
         },
+        leadingIcon = {
+            CommonImage(
+                painter = painterResource(id = android.R.drawable.ic_menu_search),
+                contentDescription = "Leading Icon",
+                modifier = Modifier.size(24.dp)
+            )
+        },
         textStyle = MaterialTheme.typography.bodyMedium.copy(fontSize = 16.sp),
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(16.dp),
     )
 }

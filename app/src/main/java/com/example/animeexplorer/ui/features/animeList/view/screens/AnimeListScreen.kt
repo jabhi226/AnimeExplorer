@@ -1,8 +1,10 @@
 package com.example.animeexplorer.ui.features.animeList.view.screens
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -60,7 +62,11 @@ fun AnimeListScreen(
         lastScrollIndex = currentScrollIndex
     }
 
-    Column(modifier = modifier.fillMaxWidth()) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+    ) {
 
         AnimatedVisibility(
             visible = (scrollDirection == ScrollState.SCROLL_UP || scrollState.firstVisibleItemIndex == 0),
@@ -69,7 +75,6 @@ fun AnimeListScreen(
                 hint = "Search anime",
                 text = searchedText,
                 modifier = Modifier
-                    .padding(top = 8.dp, start = 8.dp, end = 8.dp)
                     .fillMaxWidth(),
                 updateText = {
                     searchedText = it
@@ -81,6 +86,8 @@ fun AnimeListScreen(
         LazyVerticalGrid(
             state = scrollState,
             columns = GridCells.Fixed(2),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            contentPadding = PaddingValues(vertical = 8.dp),
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1F)
@@ -139,7 +146,7 @@ fun ShowError(count: Int, error: String?) {
 @Composable
 fun ShowLoading(count: Int) {
     if (count == 0) {
-        LoadingScreen()
+        LoadingScreen(isShowLoading =  count == 0)
     } else {
         LoadingComponent()
     }
