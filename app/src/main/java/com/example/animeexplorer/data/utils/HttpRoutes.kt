@@ -4,5 +4,7 @@ object HttpRoutes {
 
     const val BASE_URL = "https://api.jikan.moe"
     const val ANIME_LIST_URL = "$BASE_URL/v4/top/anime"
-    const val ANIME_DETAIL_URL = "$BASE_URL/v4/anime/"
+    const val ANIME_DETAIL_URL = "$BASE_URL/v4/anime"
+    const val ANIME_SEARCH_URL = ANIME_DETAIL_URL
+    fun getAnimeImageUrl(animeId: Int): String = "$BASE_URL/v4/anime/$animeId/pictures"
 }

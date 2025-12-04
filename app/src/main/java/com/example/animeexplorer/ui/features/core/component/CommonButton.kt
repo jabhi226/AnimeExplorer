@@ -17,7 +17,7 @@ fun CommonButton(
     Button(
         modifier = modifier,
         colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
-        onClick = onClick
+        onClick = onClick,
     ) {
         CommonText(text = text, textColor = MaterialTheme.colorScheme.onPrimary)
     }

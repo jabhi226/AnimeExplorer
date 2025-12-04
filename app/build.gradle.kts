@@ -87,5 +87,9 @@ dependencies {
 
     implementation(libs.accompanist.flowlayout)
 
+    // paging
+    implementation(libs.androidx.paging.runtime.ktx)
+    implementation(libs.androidx.paging.compose)
+
 
 }

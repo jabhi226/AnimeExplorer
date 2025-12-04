@@ -1,162 +1,217 @@
 package com.example.animeexplorer.ui.features.animeDetails.view.screen
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.animeexplorer.R
+import com.example.animeexplorer.domain.entities.AnimeDetails
+import com.example.animeexplorer.ui.features.animeDetails.model.Action
+import com.example.animeexplorer.ui.features.animeDetails.view.component.ActionsComponent
 import com.example.animeexplorer.ui.features.animeDetails.view.component.GenresComponent
-import com.example.animeexplorer.ui.features.animeDetails.view.component.NumbersDetailsComponent
-import com.example.animeexplorer.ui.features.animeDetails.view.component.TrailerComponent
+import com.example.animeexplorer.ui.features.animeDetails.view.component.ImagesComponent
 import com.example.animeexplorer.ui.features.animeDetails.viewmodel.AnimeDetailViewModel
 import com.example.animeexplorer.ui.features.animeDetails.viewmodel.AnimeDetailViewModel.AnimeDetailsUiState
-import com.example.animeexplorer.ui.features.core.component.CommonImage
 import com.example.animeexplorer.ui.features.core.component.CommonText
 import com.example.animeexplorer.ui.features.core.screen.ErrorScreen
 import com.example.animeexplorer.ui.features.core.screen.LoadingScreen
-import com.google.accompanist.flowlayout.FlowRow
 import kotlinx.serialization.Serializable
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun AnimeDetailScreen(modifier: Modifier = Modifier, animeId: Int) {
-
-    val viewModel = koinViewModel<AnimeDetailViewModel>()
-    val uiState by viewModel.animeDetailsUiState.collectAsState(initial = AnimeDetailsUiState.Loading)
-
-    LaunchedEffect(animeId) {
-        viewModel.getAnimeDetails(animeId)
-    }
+fun AnimeDetailScreen(
+    modifier: Modifier = Modifier,
+    viewModel: AnimeDetailViewModel = koinViewModel<AnimeDetailViewModel>(),
+    onAnimeImageClicked: (String) -> Unit
+) {
+    val uiState: AnimeDetailsUiState by viewModel.animeDetailsUiState.collectAsState()
 
     Box(
         modifier = modifier
             .fillMaxSize()
-            .padding(8.dp)
     ) {
-        when (uiState) {
-            is AnimeDetailsUiState.AnimeDetailsState -> {
-                val animeDetails = (uiState as? AnimeDetailsUiState.AnimeDetailsState)?.details
-                if (animeDetails == null) {
-                    ErrorScreen(text = "Cannot found the anime details")
-                    return
-                }
-                LazyColumn(
-                    modifier = Modifier,
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    item {
-                        TrailerComponent(
-                            modifier = modifier
-                                .fillMaxWidth()
-                                .background(
-                                    shape = RoundedCornerShape(16.dp),
-                                    color = Color.Transparent
-                                ),
-                            trailerUrl = animeDetails.trailerUrl,
-                            posterUrl = animeDetails.posterUrl,
-                        )
-                    }
-
-                    item {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Column(
-                                modifier = Modifier.weight(1F),
-                                horizontalAlignment = Alignment.Start
-                            ) {
-                                CommonText(
-                                    text = animeDetails.animeTitle,
-                                    fontSize = 14.sp
-                                )
-                                CommonText(
-                                    text = animeDetails.animeTitle,
-                                    textColor = MaterialTheme.colorScheme.secondary,
-                                )
-                            }
-
-                            animeDetails.rating?.let {
-                                Column(
-                                    verticalArrangement = Arrangement.Center,
-                                    horizontalAlignment = Alignment.CenterHorizontally
-                                ) {
-                                    Row(
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                                    ) {
-                                        CommonText(
-                                            text = "$it",
-                                        )
-                                        CommonImage(painter = painterResource(id = R.drawable.ic_star))
-                                    }
-                                    CommonText(
-                                        text = "(${animeDetails.ratedBy})",
-                                    )
-                                }
-
-                            }
-                        }
-                    }
-
-                    item {
-
-
-                        animeDetails.noOfEpisodes?.let {
-
-                            Row(
-                                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-
-                                CommonImage(painter = painterResource(id = R.drawable.ic_book))
-                                CommonText(
-                                    text = "$it Episodes ${animeDetails.duration?.let { "($it)" }}",
-                                )
-                            }
-                        }
-                    }
-
-
-                    item {
-                        GenresComponent(animeDetails.genres)
-                    }
-                    item {
-                        CommonText(modifier = Modifier.fillMaxWidth(), text = animeDetails.synopsis)
-                    }
-                    item {
-                        Spacer(modifier = Modifier.height(20.dp))
-                    }
-                }
+        if (uiState.animeDetails != null) {
+            val animeDetails = uiState.animeDetails
+            if (animeDetails == null) {
+                ErrorScreen(text = "Cannot found the anime details")
+                return
             }
-
-            is AnimeDetailsUiState.Error -> ErrorScreen(text = (uiState as? AnimeDetailsUiState.Error)?.error.toString())
-            AnimeDetailsUiState.Loading -> LoadingScreen()
+            AnimeDetails(
+                modifier = Modifier
+                    .fillMaxSize(),
+                animeDetails = animeDetails,
+            ) {
+                onAnimeImageClicked(it)
+            }
         }
+        if (!uiState.error.isNullOrEmpty()) {
+            ErrorScreen(text = uiState.error.toString())
+        }
+        LoadingScreen(isShowLoading = uiState.isLoading)
     }
 
+}
+
+@Preview(showBackground = true, showSystemUi = true, device = Devices.PIXEL_7)
+@Composable
+fun AnimeDetailPreview(modifier: Modifier = Modifier) {
+    MaterialTheme {
+        AnimeDetails(
+            modifier = modifier,
+            animeDetails = AnimeDetails.mockObject
+        ) {}
+    }
+}
+
+@Composable
+fun AnimeDetails(
+    modifier: Modifier = Modifier,
+    animeDetails: AnimeDetails,
+    onAnimeImageClicked: (String) -> Unit
+) {
+    LazyColumn(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(horizontal = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        item {
+            Box(
+                modifier = Modifier
+                    .fillParentMaxHeight(0.5F)
+            ) {
+                ImagesComponent(
+                    modifier = modifier,
+                    animeImages = animeDetails.posterUrl,
+                    onAnimeImageClicked = {
+                        onAnimeImageClicked(it)
+                    }
+                )
+            }
+
+        }
+        item {
+            CommonText(
+                modifier = Modifier.fillMaxWidth(),
+                text = animeDetails.animeTitle,
+                fontSize = 26.sp,
+                fontWeight = FontWeight.W700,
+                style = TextStyle(
+                    lineHeight = TextUnit(value = 28F, type = TextUnitType.Sp),
+                    letterSpacing = TextUnit(value = 1F, type = TextUnitType.Sp)
+                )
+            )
+        }
+
+        item {
+            Spacer(modifier = Modifier.height(8.dp))
+            val actionList = arrayListOf(
+                Action(
+                    id = 1,
+                    label = "Watch Trailer",
+                    imageId = R.drawable.ic_play,
+                    isActive = false
+                ),
+                Action(
+                    id = 1,
+                    label = "Bookmark",
+                    imageId = R.drawable.ic_bookmark,
+                    isActive = true
+                ),
+                Action(
+                    id = 1,
+                    label = "Completed",
+                    imageId = R.drawable.ic_check,
+                    isActive = true
+                ),
+            )
+            animeDetails.status?.let { status ->
+                actionList.add(
+                    1,
+                    Action(
+                        id = 1,
+                        label = status,
+                        imageId = R.drawable.ic_finished,
+                        //                        imageId = R.drawable.ic_incomplete,
+                        isActive = false
+                    ),
+                )
+            }
+            animeDetails.noOfEpisodes?.let {
+                actionList.add(
+                    1,
+                    Action(
+                        id = 1,
+                        label = "$it Episodes ${animeDetails.duration?.let { "($it)" }}",
+                        imageId = R.drawable.ic_book,
+                        isActive = false
+                    )
+                )
+            }
+            animeDetails.rank?.let { rank ->
+                if (rank < 30)
+                    actionList.add(
+                        1,
+                        Action(
+                            id = 1,
+                            label = "Rank $rank",
+                            imageId = R.drawable.ic_star,
+                            isActive = false
+                        )
+                    )
+            }
+            animeDetails.rating?.let { rating ->
+                actionList.add(
+                    1,
+                    Action(
+                        id = 1,
+                        label = "$rating Ratings",
+                        imageId = R.drawable.ic_star,
+                        isActive = false
+                    )
+                )
+            }
+            ActionsComponent(
+                modifier = Modifier, items = actionList
+            )
+        }
+        item {
+            CommonText(
+                modifier = modifier,
+                text = "Genres",
+                fontSize = 26.sp,
+                fontWeight = FontWeight.W700
+            )
+            Spacer(modifier = modifier.height(8.dp))
+            GenresComponent(modifier = modifier, genres = animeDetails.genres)
+        }
+
+        item {
+            Spacer(modifier = modifier.height(8.dp))
+            CommonText(modifier = modifier.fillMaxWidth(), text = animeDetails.synopsis)
+        }
+
+        item {
+            Spacer(modifier = modifier.height(24.dp))
+        }
+    }
 }
 
 @Serializable

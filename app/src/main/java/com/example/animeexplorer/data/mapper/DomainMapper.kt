@@ -18,17 +18,26 @@ fun AnimeListResponse.Data.getAnime(): Anime {
 
 fun AnimeDetailsResponse.Data.getAnimeDetails(): AnimeDetails? {
     try {
+
+        val thimbnil = if (trailer?.youtubeId != null) {
+            "https://img.youtube.com/vi/${trailer?.youtubeId}/hqdefault.jpg"
+        } else {
+            trailer?.images?.imageUrl ?: images?.jpg?.imageUrl
+        }
         return AnimeDetails(
             animeId = malId!!,
             animeTitle = titleEnglish ?: "NA",
             animeTitleAlt = title ?: "NA",
             synopsis = synopsis ?: "NA",
             genres = genres.map { it.name.toString() },
-            trailerUrl = trailer?.url,
-            posterUrl = images?.jpg?.imageUrl,
+            trailerUrl = trailer?.embedUrl ?: "https://www.youtube.com/embed/${trailer?.youtubeId}?autoplay=0&modestbranding=1",// trailer?.embedUrl,
+            trailerImageUrl = thimbnil,
+            posterUrl = images?.jpg?.largeImageUrl?.let { mutableSetOf(it) } ?: mutableSetOf(),
             noOfEpisodes = episodes,
             duration = duration,
+            status = status,
             rating = score?.toFloat(),
+            rank = rank,
             ratedBy = scoredBy ?: 0,
             mainCast = listOf()
         )

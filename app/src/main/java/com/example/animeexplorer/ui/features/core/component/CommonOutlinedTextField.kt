@@ -24,6 +24,7 @@ fun CommonOutlinedTextField(
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     updateText: (String) -> Unit = {},
 ) {
+
     OutlinedTextField(
         modifier = modifier
             .fillMaxWidth()
@@ -33,8 +34,9 @@ fun CommonOutlinedTextField(
         singleLine = singleLine,
         value = text,
         onValueChange = {
-            if (it.length <= maxCharacterLength)
+            if (it.length <= maxCharacterLength) {
                 updateText(it)
+            }
         },
         label = {
             CommonText(

@@ -10,4 +10,10 @@ interface AnimeRepository {
 
     suspend fun getAnimeDetails(animeId: Int): Response<AnimeDetails>
 
+    suspend fun getAnimeList(pageNumber: Int, limit: Int): Response<List<Anime>>
+
+    suspend fun getAnimeListByText(pageNumber: Int, limit: Int, text: String): Response<List<Anime>>
+
+    suspend fun getAnimeImageList(animeId: Int): Response<List<String>>
+
 }
