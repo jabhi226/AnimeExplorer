@@ -16,12 +16,9 @@ fun CommonImage(
     contentDescription: String? = null,
     tint: Color? = null,
     contentScale: ContentScale = ContentScale.Fit,
-    onClick: () -> Unit = {}
 ) {
     Image(
-        modifier = modifier.clickable {
-            onClick()
-        },
+        modifier = modifier,
         contentDescription = contentDescription,
         painter = painter,
         colorFilter = tint?.let { ColorFilter.tint(it) },

@@ -38,6 +38,7 @@ fun AnimeListItem(
             .clickable {
                 onAnimeClicked(anime.animeId)
             }
+            .padding(8.dp)
     ) {
         Box {
             if (anime.posterUrl == null) {
@@ -63,7 +64,7 @@ fun AnimeListItem(
                 modifier = Modifier
                     .align(Alignment.BottomStart)
                     .background(
-                        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.75F),
+                        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.25F),
 //                        shape = RoundedCornerShape(16.dp)
                         shape = RoundedCornerShape(topEnd = 16.dp, bottomStart = 16.dp)
                     )
@@ -71,6 +72,7 @@ fun AnimeListItem(
             ) {
                 CommonText(
                     text = "Ep ${anime.noOfEpisodes}",
+                    textColor = MaterialTheme.colorScheme.onPrimary
                 )
             }
 
@@ -79,7 +81,7 @@ fun AnimeListItem(
                     modifier = Modifier
                         .align(Alignment.BottomEnd)
                         .background(
-                            color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.75F),
+                            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.25F),
 //                            shape = RoundedCornerShape(16.dp)
                             shape = RoundedCornerShape(topStart = 16.dp, bottomEnd = 16.dp)
                         )
@@ -91,6 +93,7 @@ fun AnimeListItem(
                     ) {
                         CommonText(
                             text = "$it",
+                            textColor = MaterialTheme.colorScheme.onPrimary
                         )
                         CommonImage(painter = painterResource(id = R.drawable.ic_star))
                     }

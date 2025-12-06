@@ -43,18 +43,20 @@ fun ImagesComponent(
         state = rememberCarouselState { carouselItems.count() },
         modifier = modifier,
         itemSpacing = 8.dp,
+        maxItemWidth = 280.dp,
         contentPadding = PaddingValues(horizontal = 16.dp),
     ) { i ->
         val item = carouselItems[i]
 
         CommonAsyncImage(
             modifier = Modifier
+                .clip(RoundedCornerShape(16.dp))
                 .clickable {
                     onAnimeImageClicked(item)
                 }
                 .fillMaxSize()
 //                    .wrapContentHeight(align = Alignment.CenterVertically)
-                .clip(RoundedCornerShape(16.dp)),
+            ,
             model = item,
             contentScale = ContentScale.Fit
         )

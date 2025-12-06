@@ -64,6 +64,7 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
 
     // di
+    implementation(libs.koin.android)
     implementation(libs.koin.compose)
 
     // networking

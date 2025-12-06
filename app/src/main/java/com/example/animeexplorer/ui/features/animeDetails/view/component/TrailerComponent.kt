@@ -6,6 +6,7 @@ import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.annotation.OptIn
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -71,12 +72,14 @@ fun TrailerComponent(
             ) {
                 CommonImage(
                     modifier = Modifier
+                        .clickable {
+                            isShowVideo = false
+                        }
                         .height(48.dp)
                         .width(48.dp)
                         .align(Alignment.TopEnd)
                         .padding(8.dp),
                     painter = painterResource(android.R.drawable.ic_notification_clear_all),
-                    onClick = { isShowVideo = false }
                 )
                 Box(
                     modifier = modifier

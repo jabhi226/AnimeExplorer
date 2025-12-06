@@ -1,15 +1,20 @@
 package com.example.animeexplorer.ui.features.animeList.view.screens
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -17,14 +22,22 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.example.animeexplorer.R
 import com.example.animeexplorer.domain.entities.Anime
 import com.example.animeexplorer.ui.features.animeList.view.component.AnimeListItem
 import com.example.animeexplorer.ui.features.animeList.viewmodel.AnimeListViewModel
+import com.example.animeexplorer.ui.features.core.component.CommonImage
 import com.example.animeexplorer.ui.features.core.component.CommonOutlinedTextField
 import com.example.animeexplorer.ui.features.core.component.CommonText
 import com.example.animeexplorer.ui.features.core.component.LoadingComponent
@@ -65,29 +78,18 @@ fun AnimeListScreen(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(16.dp)
     ) {
-
         AnimatedVisibility(
             visible = (scrollDirection == ScrollState.SCROLL_UP || scrollState.firstVisibleItemIndex == 0),
         ) {
-            CommonOutlinedTextField(
-                hint = "Search anime",
-                text = searchedText,
-                modifier = Modifier
-                    .fillMaxWidth(),
-                updateText = {
-                    searchedText = it
-                    viewModel.searchByText(it)
-                }
-            )
+            SearchBar()
         }
 
         LazyVerticalGrid(
             state = scrollState,
-            columns = GridCells.Fixed(2),
+            columns = GridCells.Adaptive(minSize = 160.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
-            contentPadding = PaddingValues(vertical = 8.dp),
+            contentPadding = PaddingValues(8.dp),
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1F)
@@ -132,6 +134,38 @@ fun AnimeListScreen(
 
 }
 
+@Preview
+@Composable
+fun SearchBar(modifier: Modifier = Modifier) {
+    Row(
+        modifier = modifier
+            .background(color = Color.Transparent)
+            .fillMaxWidth()
+            .padding(8.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        CommonText(
+            modifier = modifier.padding(8.dp),
+            text = "AnimeExplorer",
+            fontSize = 18.sp,
+            textColor = MaterialTheme.colorScheme.primary
+        )
+        Box(
+            modifier = modifier
+                .clip(RoundedCornerShape(80.dp))
+                .clickable {
+
+                }
+                .padding(8.dp),
+        ) {
+            CommonImage(
+                painter = painterResource(R.drawable.ic_search)
+            )
+        }
+    }
+}
+
 
 @Composable
 fun ShowError(count: Int, error: String?) {
@@ -146,7 +180,7 @@ fun ShowError(count: Int, error: String?) {
 @Composable
 fun ShowLoading(count: Int) {
     if (count == 0) {
-        LoadingScreen(isShowLoading =  count == 0)
+        LoadingScreen(isShowLoading = count == 0)
     } else {
         LoadingComponent()
     }

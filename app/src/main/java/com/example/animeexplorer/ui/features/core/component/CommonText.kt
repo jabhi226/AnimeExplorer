@@ -40,7 +40,7 @@ fun CommonText(
     fontWeight: FontWeight = FontWeight.W500,
     textColor: Color = MaterialTheme.colorScheme.primary,
     fontFamily: FontFamily = FontFamily(Font(R.font.lexend_medium)),
-    style: TextStyle = TextStyle(letterSpacing = TextUnit(value = 0.5F, type = TextUnitType.Sp))
+    style: TextStyle = TextStyle(letterSpacing = TextUnit(value = 0.8F, type = TextUnitType.Sp))
 ) {
     Text(
         text = text,
