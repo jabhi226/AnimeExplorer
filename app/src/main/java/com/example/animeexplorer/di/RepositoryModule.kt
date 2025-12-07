@@ -7,7 +7,7 @@ import org.koin.dsl.module
 
 val repositoryModule = module {
 
-//    factory<AnimeRepository> { AnimeRepositoryImpl(get()) }
-    factory<AnimeRepository> { com.example.animeexplorer.data.repository.AnimeRepositoryImplTest() }
+    factory<AnimeRepository> { AnimeRepositoryImpl(get()) }
+//    factory<AnimeRepository> { com.example.animeexplorer.data.repository.AnimeRepositoryImplTest() }
 
 }

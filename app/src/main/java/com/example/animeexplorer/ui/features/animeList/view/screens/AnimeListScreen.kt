@@ -1,6 +1,10 @@
 package com.example.animeexplorer.ui.features.animeList.view.screens
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -27,7 +31,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.paging.LoadState
@@ -53,17 +56,19 @@ fun AnimeListScreen(
 ) {
 
     val viewModel = koinViewModel<AnimeListViewModel>()
-    val animeList: LazyPagingItems<Anime> = viewModel.animes.collectAsLazyPagingItems()
 
-    LaunchedEffect(Unit) {
-        viewModel.getAnimeListPaginated()
+    val animeList: LazyPagingItems<Anime> = viewModel.animes.collectAsLazyPagingItems()
+    val searchedText by remember { viewModel.searchedText }
+    var isShowSearchBox by remember { mutableStateOf(searchedText.isNotEmpty()) }
+
+    LaunchedEffect(searchedText) {
+        if (searchedText.isEmpty())
+            viewModel.getAnimeListPaginated()
     }
 
     val scrollState = rememberLazyGridState()
     var lastScrollIndex by remember { mutableIntStateOf(scrollState.firstVisibleItemIndex) }
     var scrollDirection by remember { mutableStateOf(ScrollState.SCROLL_UP) }
-
-    var searchedText by remember { mutableStateOf("") }
 
     LaunchedEffect(scrollState.firstVisibleItemIndex) {
         val currentScrollIndex = scrollState.firstVisibleItemIndex
@@ -82,7 +87,15 @@ fun AnimeListScreen(
         AnimatedVisibility(
             visible = (scrollDirection == ScrollState.SCROLL_UP || scrollState.firstVisibleItemIndex == 0),
         ) {
-            SearchBar()
+            SearchBar(
+                searchedText = searchedText,
+                isShowSearchBox = isShowSearchBox,
+                showSearchBar = {
+                    isShowSearchBox = it
+                },
+                updateText = {
+                    viewModel.searchByText(text = it)
+                })
         }
 
         LazyVerticalGrid(
@@ -134,36 +147,104 @@ fun AnimeListScreen(
 
 }
 
-@Preview
 @Composable
-fun SearchBar(modifier: Modifier = Modifier) {
-    Row(
-        modifier = modifier
-            .background(color = Color.Transparent)
-            .fillMaxWidth()
-            .padding(8.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        CommonText(
-            modifier = modifier.padding(8.dp),
-            text = "AnimeExplorer",
-            fontSize = 18.sp,
-            textColor = MaterialTheme.colorScheme.primary
-        )
-        Box(
-            modifier = modifier
-                .clip(RoundedCornerShape(80.dp))
-                .clickable {
+fun SearchBar(
+    modifier: Modifier = Modifier,
+    searchedText: String,
+    isShowSearchBox: Boolean,
+    showSearchBar: (Boolean) -> Unit,
+    updateText: (String) -> Unit,
+) {
 
-                }
+    Box(contentAlignment = Alignment.Center) {
+        Row(
+            modifier = modifier
+                .background(color = Color.Transparent)
+                .fillMaxWidth()
                 .padding(8.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            CommonImage(
-                painter = painterResource(R.drawable.ic_search)
+            AnimatedVisibility(
+                visible = !isShowSearchBox,
+                enter = slideInHorizontally() + fadeIn(),
+                exit = slideOutHorizontally() + fadeOut()
+            ) {
+                CommonText(
+                    modifier = modifier.padding(8.dp),
+                    text = "AnimeExplorer",
+                    fontSize = 18.sp,
+                    textColor = MaterialTheme.colorScheme.primary
+                )
+            }
+
+            AnimatedVisibility(
+                visible = !isShowSearchBox,
+                enter = slideInHorizontally() + fadeIn(),
+                exit = slideOutHorizontally() + fadeOut()
+            ) {
+                Box(
+                    modifier = modifier
+                        .clip(RoundedCornerShape(80.dp))
+                        .clickable {
+                            showSearchBar(true)
+                        }
+                        .padding(8.dp),
+                ) {
+                    CommonImage(
+                        painter = painterResource(R.drawable.ic_search),
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
+            }
+
+        }
+
+
+
+        AnimatedVisibility(
+            visible = isShowSearchBox,
+            enter = slideInHorizontally() + fadeIn(),
+            exit = slideOutHorizontally() + fadeOut()
+        ) {
+            CommonOutlinedTextField(
+                modifier = modifier.padding(horizontal = 8.dp),
+                text = searchedText,
+                updateText = {
+                    updateText(it)
+                },
+                leadingIcon = {
+                    Box(
+                        modifier = modifier
+                            .clip(RoundedCornerShape(80.dp))
+                            .padding(8.dp),
+                    ) {
+                        CommonImage(
+                            painter = painterResource(R.drawable.ic_search),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                },
+                trailingIcon = {
+                    Box(
+                        modifier = modifier
+                            .clip(RoundedCornerShape(80.dp))
+                            .clickable {
+                                updateText("")
+                                showSearchBar(false)
+                            }
+                            .padding(8.dp),
+                    ) {
+                        CommonImage(
+                            painter = painterResource(android.R.drawable.ic_menu_close_clear_cancel),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
             )
         }
     }
+
 }
 
 

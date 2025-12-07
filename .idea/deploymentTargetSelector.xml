@@ -19,6 +19,9 @@
       <SelectionState runConfigName="SearchBar">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
+      <SelectionState runConfigName="CommonOutlinedTextField">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
     </selectionStates>
   </component>
 </project>

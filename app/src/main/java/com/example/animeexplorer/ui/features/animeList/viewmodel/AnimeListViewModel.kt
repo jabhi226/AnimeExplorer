@@ -1,5 +1,7 @@
 package com.example.animeexplorer.ui.features.animeList.viewmodel
 
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
@@ -27,6 +29,9 @@ class AnimeListViewModel(
         MutableStateFlow(value = PagingData.empty())
     val animes: StateFlow<PagingData<Anime>> get() = _animes
 
+    private val _searchedText: MutableState<String> = mutableStateOf("")
+    val searchedText get() = _searchedText
+
     suspend fun getAnimeListPaginated() {
         getAnimePager { pageNumber ->
             repository.getAnimeList(pageNumber, PAGE_SIZE)
@@ -39,7 +44,9 @@ class AnimeListViewModel(
 
     private var searchJob: Job? = null
     fun searchByText(text: String) {
+        _searchedText.value = text
         _animes.value = PagingData.empty()
+        if (text.isEmpty()) return
         searchJob?.cancel()
         searchJob = viewModelScope.launch {
             delay(300)
