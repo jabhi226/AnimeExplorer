@@ -27,14 +27,13 @@ class AnimeDetailViewModel(
         viewModelScope.launch {
             val state = animeDetailsUiState.value
             val details = animeDetails ?: state.animeDetails
-            animeImages?.let {
-                details?.posterUrl?.addAll(it)
-            }
+            val images = (details?.posterUrl.orEmpty() + (animeImages ?: emptyList())).toMutableSet()
+
             _animeDetailsUiState.emit(
                 state.copy(
                     isLoading = isLoading ?: false,
                     error = error ?: state.error,
-                    animeDetails = details,
+                    animeDetails = details?.copy(posterUrl = images),
                 )
             )
         }

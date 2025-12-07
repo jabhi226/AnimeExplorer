@@ -36,8 +36,7 @@ fun ImagesComponent(
     animeImages: MutableSet<String>,
     onAnimeImageClicked: (String) -> Unit
 ) {
-
-    val carouselItems = remember { animeImages.toList() }
+    val carouselItems = animeImages.toList()
 
     HorizontalCenteredHeroCarousel(
         state = rememberCarouselState { carouselItems.count() },
