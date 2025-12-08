@@ -12,6 +12,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -27,11 +31,13 @@ import com.example.animeexplorer.ui.features.animeDetails.model.Action
 import com.example.animeexplorer.ui.features.animeDetails.view.component.ActionsComponent
 import com.example.animeexplorer.ui.features.animeDetails.view.component.GenresComponent
 import com.example.animeexplorer.ui.features.animeDetails.view.component.ImagesComponent
+import com.example.animeexplorer.ui.features.animeDetails.view.component.TrailerComponent
 import com.example.animeexplorer.ui.features.animeDetails.viewmodel.AnimeDetailViewModel
 import com.example.animeexplorer.ui.features.animeDetails.viewmodel.AnimeDetailViewModel.AnimeDetailsUiState
 import com.example.animeexplorer.ui.features.core.component.CommonText
 import com.example.animeexplorer.ui.features.core.screen.ErrorScreen
 import com.example.animeexplorer.ui.features.core.screen.LoadingScreen
+import com.example.animeexplorer.utils.AppConstants
 import kotlinx.serialization.Serializable
 import org.koin.androidx.compose.koinViewModel
 
@@ -86,6 +92,21 @@ fun AnimeDetails(
     animeDetails: AnimeDetails,
     onAnimeImageClicked: (String) -> Unit
 ) {
+
+    var isShowTrailer by remember { mutableStateOf(false) }
+
+    if (isShowTrailer) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            TrailerComponent(
+                modifier = modifier.fillMaxSize(),
+                trailerUrl = animeDetails.trailerUrl,
+                onDismiss = {
+                    isShowTrailer = false
+                }
+            )
+        }
+    }
+
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
@@ -107,6 +128,7 @@ fun AnimeDetails(
             }
 
         }
+
         item {
             CommonText(
                 modifier = Modifier.fillMaxWidth(),
@@ -124,33 +146,33 @@ fun AnimeDetails(
             Spacer(modifier = Modifier.height(8.dp))
             val actionList = arrayListOf(
                 Action(
-                    id = 1,
+                    id = AppConstants.ACTION_TYPE_WATCH_TRAILER,
                     label = "Watch Trailer",
                     imageId = R.drawable.ic_play,
-                    isActive = false
+                    isClickable = true
                 ),
                 Action(
-                    id = 1,
+                    id = AppConstants.ACTION_TYPE_BOOKMARK,
                     label = "Bookmark",
                     imageId = R.drawable.ic_bookmark,
-                    isActive = true
+                    isClickable = true
                 ),
                 Action(
-                    id = 1,
+                    id = AppConstants.ACTION_TYPE_COMPLETED_WATCHING,
                     label = "Completed",
                     imageId = R.drawable.ic_check,
-                    isActive = true
+                    isClickable = true
                 ),
             )
             animeDetails.status?.let { status ->
                 actionList.add(
                     1,
                     Action(
-                        id = 1,
+                        id = AppConstants.ACTION_TYPE_IS_FINISHED,
                         label = status,
                         imageId = R.drawable.ic_finished,
                         //                        imageId = R.drawable.ic_incomplete,
-                        isActive = false
+                        isClickable = false
                     ),
                 )
             }
@@ -158,10 +180,10 @@ fun AnimeDetails(
                 actionList.add(
                     1,
                     Action(
-                        id = 1,
+                        id = AppConstants.ACTION_TYPE_NO_OF_EPISODES,
                         label = "$it Episodes ${animeDetails.duration?.let { "($it)" }}",
                         imageId = R.drawable.ic_book,
-                        isActive = false
+                        isClickable = false
                     )
                 )
             }
@@ -170,10 +192,10 @@ fun AnimeDetails(
                     actionList.add(
                         1,
                         Action(
-                            id = 1,
+                            id = AppConstants.ACTION_TYPE_RANK,
                             label = "Rank $rank",
                             imageId = R.drawable.ic_star,
-                            isActive = false
+                            isClickable = false
                         )
                     )
             }
@@ -181,15 +203,31 @@ fun AnimeDetails(
                 actionList.add(
                     1,
                     Action(
-                        id = 1,
+                        id = AppConstants.ACTION_TYPE_RATING,
                         label = "$rating Ratings",
                         imageId = R.drawable.ic_star,
-                        isActive = false
+                        isClickable = false
                     )
                 )
             }
             ActionsComponent(
-                modifier = Modifier, items = actionList
+                modifier = Modifier,
+                items = actionList,
+                handleItemClick = {
+                    when (it.id) {
+                        AppConstants.ACTION_TYPE_WATCH_TRAILER -> {
+                            isShowTrailer = true
+                        }
+
+                        AppConstants.ACTION_TYPE_BOOKMARK -> {
+
+                        }
+
+                        AppConstants.ACTION_TYPE_COMPLETED_WATCHING -> {
+
+                        }
+                    }
+                }
             )
         }
         item {

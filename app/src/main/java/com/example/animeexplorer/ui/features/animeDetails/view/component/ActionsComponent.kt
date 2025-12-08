@@ -1,6 +1,7 @@
 package com.example.animeexplorer.ui.features.animeDetails.view.component
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -39,34 +40,36 @@ fun ActionPre(modifier: Modifier = Modifier) {
                         id = 1,
                         label = "Watch Trailer",
                         imageId = R.drawable.ic_play,
-                        isActive = true
+                        isClickable = true
                     ),
                     Action(
                         id = 1,
                         label = "Bookmark",
                         imageId = R.drawable.ic_bookmark,
-                        isActive = false
+                        isClickable = false
                     ),
                     Action(
                         id = 1,
                         label = "8.95 Rating",
                         imageId = R.drawable.ic_star,
-                        isActive = true
+                        isClickable = true
                     ),
                     Action(
                         id = 1,
                         label = "Completed",
                         imageId = R.drawable.ic_check,
-                        isActive = false
+                        isClickable = false
                     ),
                     Action(
                         id = 1,
                         label = "Rank 3",
                         imageId = R.drawable.ic_star,
-                        isActive = true
+                        isClickable = true
                     ),
                 )
-            )
+            ) {
+
+            }
         }
 
     }
@@ -75,7 +78,8 @@ fun ActionPre(modifier: Modifier = Modifier) {
 @Composable
 fun ActionsComponent(
     modifier: Modifier = Modifier,
-    items: List<Action>
+    items: List<Action>,
+    handleItemClick: (Action) -> Unit
 ) {
     FlowRow(
         modifier = modifier,
@@ -89,8 +93,17 @@ fun ActionsComponent(
                 modifier = Modifier
                     .fillMaxHeight()
                     .background(
-                        color = if (item.isActive) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.inverseSurface,
+                        color = if (item.isClickable) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.inverseSurface,
                         shape = RoundedCornerShape(8.dp)
+                    )
+                    .then(
+                        if (item.isClickable) {
+                            Modifier.clickable {
+                                handleItemClick(item)
+                            }
+                        } else {
+                            Modifier
+                        }
                     )
                     .padding(8.dp)
                     .sizeIn(minHeight = 24.dp),
@@ -99,11 +112,11 @@ fun ActionsComponent(
             ) {
                 CommonImage(
                     painter = painterResource(item.imageId),
-                    tint = if (item.isActive) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.inverseOnSurface
+                    tint = if (item.isClickable) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.inverseOnSurface
                 )
                 CommonText(
                     text = item.label,
-                    textColor = if (item.isActive) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.inverseOnSurface
+                    textColor = if (item.isClickable) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.inverseOnSurface
                 )
             }
 
