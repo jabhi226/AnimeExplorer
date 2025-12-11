@@ -5,14 +5,17 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.animeexplorer.domain.entities.AnimeDetails
 import com.example.animeexplorer.domain.repository.AnimeRepository
+import com.example.animeexplorer.domain.repository.UserRepository
 import com.example.animeexplorer.domain.util.Response
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class AnimeDetailViewModel(
     savedStateHandle: SavedStateHandle,
-    private val repository: AnimeRepository
+    private val repository: AnimeRepository,
+    private val userRepository: UserRepository,
 ) : ViewModel() {
 
     private val _animeDetailsUiState = MutableStateFlow(AnimeDetailsUiState())
@@ -27,7 +30,8 @@ class AnimeDetailViewModel(
         viewModelScope.launch {
             val state = animeDetailsUiState.value
             val details = animeDetails ?: state.animeDetails
-            val images = (details?.posterUrl.orEmpty() + (animeImages ?: emptyList())).toMutableSet()
+            val images =
+                (details?.posterUrl.orEmpty() + (animeImages ?: emptyList())).toMutableSet()
 
             _animeDetailsUiState.emit(
                 state.copy(
@@ -39,12 +43,27 @@ class AnimeDetailViewModel(
         }
     }
 
+    var isCompleted: Flow<Boolean>? = null
+    var isBookmarked: Flow<Boolean>? = null
+
     init {
         savedStateHandle.get<Int>("animeId")?.let {
             getAnimeDetails(it)
             getAnimeImages(it)
+            isCompleted = userRepository.getIsCompleted(it)
+            isBookmarked = userRepository.getIsBookmarked(it)
         } ?: {
             updateState(error = "Anime Not Found")
+        }
+    }
+
+    fun updateIsCompleted(isCompleted: Boolean?, animeId: String) {
+        viewModelScope.launch {
+            if (isCompleted == true) {
+                userRepository.removeCompleted(animeId)
+            } else {
+                userRepository.upsertCompleted(animeId)
+            }
         }
     }
 
@@ -79,6 +98,16 @@ class AnimeDetailViewModel(
                         updateState(animeImages = this.value)
                     }
                 }
+            }
+        }
+    }
+
+    fun updateIsBookmarked(isBookmarked: Boolean?, animeId: String) {
+        viewModelScope.launch {
+            if (isBookmarked == true) {
+                userRepository.removeBookmarked(animeId)
+            } else {
+                userRepository.upsertBookmarked(animeId)
             }
         }
     }

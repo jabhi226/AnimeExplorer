@@ -10,7 +10,7 @@ val viewModelModule = module {
     viewModel { AnimeListViewModel(get()) }
 
     viewModel { (state: SavedStateHandle) ->
-        AnimeDetailViewModel(state, get())
+        AnimeDetailViewModel(state, get(), get())
     }
 
 }

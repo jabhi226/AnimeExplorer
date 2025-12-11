@@ -63,6 +63,7 @@ fun AnimeDetailScreen(
                 modifier = Modifier
                     .fillMaxSize(),
                 animeDetails = animeDetails,
+                viewModel = viewModel,
             ) {
                 onAnimeImageClicked(it)
             }
@@ -81,7 +82,8 @@ fun AnimeDetailPreview(modifier: Modifier = Modifier) {
     MaterialTheme {
         AnimeDetails(
             modifier = modifier,
-            animeDetails = AnimeDetails.mockObject
+            animeDetails = AnimeDetails.mockObject,
+            viewModel = koinViewModel<AnimeDetailViewModel>(),
         ) {}
     }
 }
@@ -90,10 +92,14 @@ fun AnimeDetailPreview(modifier: Modifier = Modifier) {
 fun AnimeDetails(
     modifier: Modifier = Modifier,
     animeDetails: AnimeDetails,
+    viewModel: AnimeDetailViewModel,
     onAnimeImageClicked: (String) -> Unit
 ) {
 
     var isShowTrailer by remember { mutableStateOf(false) }
+
+    val isCompleted = viewModel.isCompleted?.collectAsState(false)
+    val isBookmarked = viewModel.isBookmarked?.collectAsState(false)
 
     if (isShowTrailer) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -153,13 +159,21 @@ fun AnimeDetails(
                 ),
                 Action(
                     id = AppConstants.ACTION_TYPE_BOOKMARK,
-                    label = "Bookmark",
+                    label = if (isBookmarked?.value == true) {
+                        "Bookmarked"
+                    } else {
+                        "Bookmark"
+                    },
                     imageId = R.drawable.ic_bookmark,
                     isClickable = true
                 ),
                 Action(
                     id = AppConstants.ACTION_TYPE_COMPLETED_WATCHING,
-                    label = "Completed",
+                    label = if (isCompleted?.value == true) {
+                        "Completed"
+                    } else {
+                        "Not Completed"
+                    },
                     imageId = R.drawable.ic_check,
                     isClickable = true
                 ),
@@ -220,16 +234,17 @@ fun AnimeDetails(
                         }
 
                         AppConstants.ACTION_TYPE_BOOKMARK -> {
-
+                            viewModel.updateIsBookmarked(isBookmarked?.value, animeDetails.animeId.toString())
                         }
 
                         AppConstants.ACTION_TYPE_COMPLETED_WATCHING -> {
-
+                            viewModel.updateIsCompleted(isCompleted?.value, animeDetails.animeId.toString())
                         }
                     }
                 }
             )
         }
+
         item {
             CommonText(
                 modifier = modifier,
