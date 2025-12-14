@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -48,6 +49,10 @@ fun AnimeDetailScreen(
     onAnimeImageClicked: (String) -> Unit
 ) {
     val uiState: AnimeDetailsUiState by viewModel.animeDetailsUiState.collectAsState()
+
+    LaunchedEffect(uiState) {
+        println("==> posterUrl: " + uiState.animeDetails?.posterUrl?.joinToString())
+    }
 
     Box(
         modifier = modifier
@@ -164,18 +169,27 @@ fun AnimeDetails(
                     } else {
                         "Bookmark"
                     },
-                    imageId = R.drawable.ic_bookmark,
-                    isClickable = true
+                    imageId = if (isBookmarked?.value == true) {
+                        R.drawable.ic_bookmark_filled
+                    } else {
+                        R.drawable.ic_bookmark
+                    },
+                    isClickable = isBookmarked?.value == false
                 ),
                 Action(
                     id = AppConstants.ACTION_TYPE_COMPLETED_WATCHING,
                     label = if (isCompleted?.value == true) {
-                        "Completed"
+                        "Finished Watching"
                     } else {
-                        "Not Completed"
+                        "Yet to watch"
                     },
-                    imageId = R.drawable.ic_check,
-                    isClickable = true
+                    imageId =
+                    if (isCompleted?.value == true) {
+                        R.drawable.ic_check
+                    } else {
+                        R.drawable.ic_dash
+                    },
+                    isClickable = isCompleted?.value == false
                 ),
             )
             animeDetails.status?.let { status ->
@@ -184,8 +198,11 @@ fun AnimeDetails(
                     Action(
                         id = AppConstants.ACTION_TYPE_IS_FINISHED,
                         label = status,
-                        imageId = R.drawable.ic_finished,
-                        //                        imageId = R.drawable.ic_incomplete,
+                        imageId = if (status.equals("finished airing", true)) {
+                            R.drawable.ic_finished
+                        } else {
+                            R.drawable.ic_incomplete
+                        },
                         isClickable = false
                     ),
                 )
@@ -234,11 +251,17 @@ fun AnimeDetails(
                         }
 
                         AppConstants.ACTION_TYPE_BOOKMARK -> {
-                            viewModel.updateIsBookmarked(isBookmarked?.value, animeDetails.animeId.toString())
+                            viewModel.updateIsBookmarked(
+                                isBookmarked?.value,
+                                animeDetails.animeId.toString()
+                            )
                         }
 
                         AppConstants.ACTION_TYPE_COMPLETED_WATCHING -> {
-                            viewModel.updateIsCompleted(isCompleted?.value, animeDetails.animeId.toString())
+                            viewModel.updateIsCompleted(
+                                isCompleted?.value,
+                                animeDetails.animeId.toString()
+                            )
                         }
                     }
                 }

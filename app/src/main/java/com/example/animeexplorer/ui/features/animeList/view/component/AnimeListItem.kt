@@ -64,7 +64,7 @@ fun AnimeListItem(
                 modifier = Modifier
                     .align(Alignment.BottomStart)
                     .background(
-                        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.25F),
+                        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.25F),
 //                        shape = RoundedCornerShape(16.dp)
                         shape = RoundedCornerShape(topEnd = 16.dp, bottomStart = 16.dp)
                     )
@@ -72,7 +72,7 @@ fun AnimeListItem(
             ) {
                 CommonText(
                     text = "Ep ${anime.noOfEpisodes}",
-                    textColor = MaterialTheme.colorScheme.onPrimary
+                    textColor = MaterialTheme.colorScheme.onSurface
                 )
             }
 
@@ -81,7 +81,7 @@ fun AnimeListItem(
                     modifier = Modifier
                         .align(Alignment.BottomEnd)
                         .background(
-                            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.25F),
+                            color = MaterialTheme.colorScheme.surface.copy(alpha = 0.25F),
 //                            shape = RoundedCornerShape(16.dp)
                             shape = RoundedCornerShape(topStart = 16.dp, bottomEnd = 16.dp)
                         )
@@ -93,7 +93,7 @@ fun AnimeListItem(
                     ) {
                         CommonText(
                             text = "$it",
-                            textColor = MaterialTheme.colorScheme.onPrimary
+                            textColor = MaterialTheme.colorScheme.onSurface
                         )
                         CommonImage(painter = painterResource(id = R.drawable.ic_star))
                     }

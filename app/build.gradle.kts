@@ -27,6 +27,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("debug")
         }
     }
     compileOptions {
@@ -38,6 +39,9 @@ android {
     }
     buildFeatures {
         compose = true
+    }
+    lint {
+        disable.add("NullSafeMutableLiveData")
     }
 }
 

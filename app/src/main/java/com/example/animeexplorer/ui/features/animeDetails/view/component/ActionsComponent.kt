@@ -97,13 +97,13 @@ fun ActionsComponent(
                         shape = RoundedCornerShape(8.dp)
                     )
                     .then(
-                        if (item.isClickable) {
-                            Modifier.clickable {
-                                handleItemClick(item)
-                            }
+                        Modifier.clickable {
+                            handleItemClick(item)
+                        }
+                        /*if (item.isClickable) {
                         } else {
                             Modifier
-                        }
+                        }*/
                     )
                     .padding(8.dp)
                     .sizeIn(minHeight = 24.dp),
